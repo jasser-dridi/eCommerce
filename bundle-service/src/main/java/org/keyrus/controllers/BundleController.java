@@ -42,8 +42,8 @@ public class BundleController {
     }
 
     @DELETE
-    @Path("delete-bundle/{bundleId}")
-    public Uni<Response> deleteBundle(ObjectId id){
+    @Path("delete-bundle/{bundleID}")
+    public Uni<Response> deleteBundle(@PathParam("bundleID") ObjectId id){
         return bundleService.delete(id);
     }
 }
