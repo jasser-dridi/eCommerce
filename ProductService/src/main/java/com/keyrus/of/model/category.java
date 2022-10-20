@@ -15,17 +15,12 @@ public class category extends ReactivePanacheMongoEntity {
     @NotNull
     public String description;
 
-/*
     public category(ObjectId id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
- */
-    public category() {
-    }
 
-    public category(ObjectId id) {
-        this.id = id;
+    public category() {
     }
 }
