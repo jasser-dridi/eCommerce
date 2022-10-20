@@ -1,13 +1,17 @@
 package com.keyrus.of.model;
+
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoEntity;
 import lombok.Builder;
 import org.bson.types.ObjectId;
+
 import javax.validation.constraints.NotNull;
+
 import com.keyrus.of.model.category;
+
 @Builder
 
-@MongoEntity(collection="product")
+@MongoEntity(collection = "product")
 public class product extends ReactivePanacheMongoEntity {
     @NotNull
     public ObjectId id;
@@ -20,7 +24,7 @@ public class product extends ReactivePanacheMongoEntity {
     public String description;
 
     @NotNull
- //   public String category;
+    //   public String category;
     public category category;
 
     public product(ObjectId id, String name, float price, String description, category category) {

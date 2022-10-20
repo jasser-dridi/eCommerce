@@ -1,17 +1,15 @@
 package com.keyrus.of.service;
 
 import com.keyrus.of.repository.productRepository;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import java.lang.Exception;
-import java.net.URI;
 import java.time.Duration;
-import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
 import com.keyrus.of.model.product;
-import io.quarkus.hibernate.orm.panache.Panache;
-import io.quarkus.hibernate.orm.panache.Panache.*;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
@@ -42,13 +40,19 @@ public class productService {
     }
 
     public Uni<Response> updateProduct(product p) {
-      return productRepository
+        return productRepository
                 .findById(p.id)
                 .call(product -> productRepository.update(p))
-                .map(it->Response.status(Response.Status.OK).entity(it).build())
+                .map(it -> Response.status(Response.Status.OK).entity(it).build())
                 .ifNoItem()
                 .after(Duration.ofSeconds(7))
                 .recoverWithUni(Uni.createFrom().item(Response.noContent().build()));
 
     }
+
+    public Uni<product> categoryExist(ObjectId categoryId) {
+        return productRepository.streamAll().select()
+                .when(product -> Uni.createFrom().item(categoryId.equals(product.category.id)))
+                .toUni();
     }
+}

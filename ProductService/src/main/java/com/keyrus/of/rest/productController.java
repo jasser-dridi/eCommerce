@@ -1,4 +1,5 @@
 package com.keyrus.of.rest;
+
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -40,7 +41,7 @@ public class productController {
     @Path("/add-product")
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> addProduct(product b) {
-       return productService.addProduct(b);
+        return productService.addProduct(b);
     }
 
     @DELETE
@@ -53,7 +54,13 @@ public class productController {
     @Path("update-product")
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<Response> updateProduct(product p) {
-   return productService.updateProduct(p);
+        return productService.updateProduct(p);
+
+    }
+    @Path("/existCategory/{idCategory}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<product> existCategory(@PathParam("idCategory") ObjectId id) {
+        return productService.categoryExist(id);
 
     }
 }
