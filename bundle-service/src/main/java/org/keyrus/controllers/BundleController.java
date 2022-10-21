@@ -29,6 +29,12 @@ public class BundleController {
         return bundleService.findById(id);
     }
 
+    @GET
+    @Path("get-by-product-id/{productID}")
+    public Uni<Response> getByProductID(@PathParam("productID") ObjectId id){
+        return bundleService.findAllByProductId(id);
+    }
+
     @POST
     @Path("add-bundle")
     public Uni<Response> addBundle(Bundle bundle){
