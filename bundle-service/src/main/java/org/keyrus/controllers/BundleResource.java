@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 @Path("/api/bundles")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class BundleController {
+public class BundleResource {
 
     @Inject
     BundleService bundleService;
