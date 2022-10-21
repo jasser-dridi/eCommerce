@@ -19,6 +19,26 @@ public class BundleService {
         return bundleRepository.streamAll().collect().asList().map(bundles -> Response.ok(bundles).build());
     }
 
+    public Uni<Response> findAllByProductId(ObjectId id) {
+        return bundleRepository.count("products._id", id).chain(count ->
+                {
+                    if (count < 1) {
+                        return Uni.createFrom().item(Response.noContent().build());
+                    }
+                    return Uni.createFrom().item(Response.status(Response.Status.FOUND).entity(count).build());
+
+                }
+        );
+        /*
+        return bundleRepository.stream("products._id", id).collect().asList().map(bundles -> {
+            if (bundles.isEmpty()) {
+                return Response.noContent().build();
+            }
+            return Response.status(Response.Status.FOUND).entity(bundles).build();
+        });
+        */
+    }
+
     public Uni<Response> findById(ObjectId id) {
         return bundleRepository.findById(id).onItem().ifNull().failWith(
                 notFound()

@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 @Path("/api/bundles")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class BundleController {
+public class BundleResource {
 
     @Inject
     BundleService bundleService;
@@ -27,6 +27,12 @@ public class BundleController {
     @Path("/{bundleID}")
     public Uni<Response> getByID(@PathParam("bundleID") ObjectId id) {
         return bundleService.findById(id);
+    }
+
+    @GET
+    @Path("get-by-product-id/{productID}")
+    public Uni<Response> getByProductID(@PathParam("productID") ObjectId id){
+        return bundleService.findAllByProductId(id);
     }
 
     @POST
