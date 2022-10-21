@@ -7,23 +7,32 @@ import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
 
-//@Builder
-@MongoEntity(collection = "category")
-public class category extends ReactivePanacheMongoEntity {
+@Builder
+
+@MongoEntity(collection = "product")
+public class Product extends ReactivePanacheMongoEntity {
     @NotNull
     public ObjectId id;
+
     @NotNull
     public String name;
-
+    @NotNull
+    public float price;
     @NotNull
     public String description;
 
-    public category(ObjectId id, String name, String description) {
+    @NotNull
+    //   public String category;
+    public category category;
+
+    public Product(ObjectId id, String name, float price, String description, category category) {
         this.id = id;
         this.name = name;
+        this.price = price;
         this.description = description;
+        this.category = category;
     }
 
-    public category() {
+    public Product() {
     }
 }

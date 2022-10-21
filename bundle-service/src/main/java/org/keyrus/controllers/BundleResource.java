@@ -37,19 +37,19 @@ public class BundleResource {
 
     @POST
     @Path("add-bundle")
-    public Uni<Response> addBundle(Bundle bundle){
+    public Uni<Response> addBundle(Bundle bundle) {
         return bundleService.save(bundle);
     }
 
     @PUT
     @Path("update-bundle")
-    public Uni<Response> updateBundle(Bundle bundle){
+    public Uni<Response> updateBundle(Bundle bundle) {
         return bundleService.update(bundle);
     }
 
     @DELETE
     @Path("delete-bundle/{bundleID}")
-    public Uni<Response> deleteBundle(@PathParam("bundleID") ObjectId id){
+    public Uni<Response> deleteBundle(@PathParam("bundleID") ObjectId id) {
         return bundleService.delete(id);
     }
 }

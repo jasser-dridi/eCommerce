@@ -9,11 +9,12 @@ import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-@Singleton
 @Path("/api/products")
 @RegisterRestClient
+@javax.enterprise.context.ApplicationScoped
 public interface ProductClient {
 
-    @Path("/{productID}")
-    public Uni<Product> getOne(@PathParam("productID")ObjectId productId);
+    @Path("/existCategory/{idCategory}")
+    @javax.ws.rs.GET
+   public  Uni<Long> getOne(@PathParam("idCategory") ObjectId productId);
 }
