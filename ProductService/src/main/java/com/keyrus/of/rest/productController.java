@@ -5,8 +5,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.keyrus.of.model.category;
-import com.keyrus.of.model.product;
+import com.keyrus.of.model.Product;
 import com.keyrus.of.repository.productRepository;
 import com.keyrus.of.service.productService;
 import io.smallrye.mutiny.Multi;
@@ -14,7 +13,8 @@ import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
 
 //@Authenticated
-@Path("api/products")
+@Path("/api/products")
+@Produces(MediaType.APPLICATION_JSON)
 public class productController {
 
     @Inject
@@ -25,14 +25,14 @@ public class productController {
     @GET
     @Path("listProducts")
     @Produces(MediaType.APPLICATION_JSON)
-    public Multi<product> getListProduct() {
+    public Multi<Product> getListProduct() {
         return productService.all();
     }
 
     @GET
     @Path("one-product/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<product> findOne(@PathParam("id") String id) {
+    public Uni<Product> findOne(@PathParam("id") String id) {
 
         return productService.findOne(id);
     }
@@ -40,7 +40,7 @@ public class productController {
     @POST
     @Path("/add-product")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> addProduct(product b) {
+    public Uni<Response> addProduct(Product b) {
         return productService.addProduct(b);
     }
 
@@ -53,14 +53,15 @@ public class productController {
     @PUT
     @Path("update-product")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Response> updateProduct(product p) {
+    public Uni<Response> updateProduct(Product p) {
         return productService.updateProduct(p);
 
     }
+    @GET
     @Path("/existCategory/{idCategory}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Uni<product> existCategory(@PathParam("idCategory") ObjectId id) {
+        public Uni<Long> existCategory(@PathParam("idCategory") ObjectId    id)
+    {
+        System.out.println(id);
         return productService.categoryExist(id);
-
     }
 }

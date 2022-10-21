@@ -7,12 +7,10 @@ import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
 
-import com.keyrus.of.model.category;
-
 @Builder
 
 @MongoEntity(collection = "product")
-public class product extends ReactivePanacheMongoEntity {
+public class Product extends ReactivePanacheMongoEntity {
     @NotNull
     public ObjectId id;
 
@@ -27,7 +25,7 @@ public class product extends ReactivePanacheMongoEntity {
     //   public String category;
     public category category;
 
-    public product(ObjectId id, String name, float price, String description, category category) {
+    public Product(ObjectId id, String name, float price, String description, category category) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -35,6 +33,6 @@ public class product extends ReactivePanacheMongoEntity {
         this.category = category;
     }
 
-    public product() {
+    public Product() {
     }
 }

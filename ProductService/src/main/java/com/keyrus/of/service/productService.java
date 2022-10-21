@@ -10,7 +10,7 @@ import java.time.Duration;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-import com.keyrus.of.model.product;
+import com.keyrus.of.model.Product;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
@@ -25,23 +25,23 @@ public class productService {
     @RestClient
     BundleClient bundleClient;
 
-    public Multi<product> all() {
+    public Multi<Product> all() {
         return productRepository.streamAll().onCompletion().ifEmpty().failWith(() -> new Exception("No data found "));
     }
 
-    public Uni<product> findOne(@PathParam("id") String id) {
+    public Uni<Product> findOne(@PathParam("id") String id) {
         return productRepository.findById(new ObjectId(id)).onItem().ifNull().failWith(() -> new Exception("No Data!"));
     }
 
-    public Uni<Response> addProduct(product p) {
+    public Uni<Response> addProduct(Product p) {
         return productRepository.persist(p).map(book1 -> Response.status(Response.Status.CREATED).entity(book1).build());
     }
 
 
-    public Uni<Response> updateProduct(product p) {
+    public Uni<Response> updateProduct(Product p) {
         return productRepository
                 .findById(p.id)
-                .call(product -> productRepository.update(p))
+                .call(Product -> productRepository.update(p))
                 .map(it -> Response.status(Response.Status.OK).entity(it).build())
                 .ifNoItem()
                 .after(Duration.ofSeconds(7))
@@ -49,10 +49,8 @@ public class productService {
 
     }
 
-    public Uni<product> categoryExist(ObjectId categoryId) {
-        return productRepository.streamAll().select()
-                .when(product -> Uni.createFrom().item(categoryId.equals(product.category.id)))
-                .toUni();
+    public Uni<Long> categoryExist(ObjectId categoryId) {
+        return productRepository.findByCategoryId(categoryId);
     }
     public Uni<Response> deleteProduct(String id) {
         Response response=bundleClient.findByProductID(id);
@@ -60,7 +58,7 @@ public class productService {
             return Uni.createFrom().item(Response.notModified(response.getEntity().toString()).build());
         }
 
-        Uni<product> p = productRepository.findById(new ObjectId(id));
+        Uni<Product> p = productRepository.findById(new ObjectId(id));
         if (p == null) {
             throw new NotFoundException();
         }
