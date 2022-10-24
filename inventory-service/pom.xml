@@ -41,8 +41,17 @@
       <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.24</version>
+    </dependency>
+    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-arc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
