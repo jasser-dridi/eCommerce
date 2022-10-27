@@ -2,10 +2,12 @@ package com.keyrus.ecommerce.category.ressource;
 
 import com.keyrus.ecommerce.category.model.Category;
 import com.keyrus.ecommerce.category.model.Product;
+import com.keyrus.ecommerce.category.producers.CategoryProducer;
 import com.keyrus.ecommerce.category.repository.CategoryRepository;
 import com.keyrus.ecommerce.category.service.CategoryService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.smallrye.reactive.messaging.kafka.Record;
 import org.bson.types.ObjectId;
 
 import javax.inject.Inject;
@@ -20,11 +22,13 @@ public class CategoryRessource {
     @Inject
     CategoryService categoryService;
 
-
+    @Inject
+    CategoryProducer categoryProducer;
     @GET
     @Path("/")
-    public Multi<Category> getAll() {
-        return categoryService.getAll();
+    public Multi<Record<ObjectId, Category>> getAll() {
+      return   categoryProducer.category();
+
     }
 
     @GET

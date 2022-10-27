@@ -1,14 +1,11 @@
 package com.keyrus.ecommerce.category.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.bson.types.ObjectId;
 
-@NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Category {
 
     private ObjectId id;
