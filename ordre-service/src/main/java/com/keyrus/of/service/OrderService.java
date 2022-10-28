@@ -8,6 +8,8 @@ import com.keyrus.of.repository.OrdreRepository;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -49,7 +51,7 @@ public class OrderService {
                 .map(inventory -> {
                     savedInventory = inventory;
                     if (inventory.getQte() < 1) {
-                        throw new NotAcceptableException(Response.status(Response.Status.NOT_ACCEPTABLE).entity("{\"message\": \"Quantity is null\"}").build());
+                        throw new NotAcceptableException(Response.status(Response.Status.NOT_ACCEPTABLE).entity("{\"message\": \"Out of stock\"}").build());
                     }
                     o.setState(State.Validated);
                     return o;
@@ -96,5 +98,18 @@ public class OrderService {
     public Uni<Long> findCountProductId(ObjectId id) {
         return OrderRepository.count(" state='Validated' where product.id = ?1 ", id);
 
+    }
+
+    @Incoming("inventory")
+    @Outgoing("mail")
+    public Multi<String> getOrdersByProductId(Inventory inventory) {
+        return OrderRepository.stream(" state='Pending' where product.id = ?1 ", inventory.getProductId())
+                .map(order -> {
+                    return "Bonjour mr/mrs "
+                            + order.getUser().nom
+                            + order.getUser().getPrenom()
+                            + " votre commande en cours doit être annulée car le produit est hors stock";
+                        }
+                );
     }
 }
