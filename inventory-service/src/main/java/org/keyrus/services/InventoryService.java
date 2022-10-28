@@ -72,6 +72,11 @@ public class InventoryService {
                 .entity("{\"message\":\"Inventory does not exist\"}").build());
     }
 
+
+    @Inject
+    @Channel("inventory")
+    Emitter<Inventory> inventoryEmitter;
+
     public Uni<Inventory> generate(Inventory notificationInventory) {
         inventoryEmitter.send(Message.of(notificationInventory)
                 .withAck(() ->
@@ -88,6 +93,7 @@ public class InventoryService {
 
         return Uni.createFrom().item(notificationInventory);
     }
+
 
     public Uni<Inventory> getInventoryByProductID(ObjectId id) {
         return inventoryRepository
