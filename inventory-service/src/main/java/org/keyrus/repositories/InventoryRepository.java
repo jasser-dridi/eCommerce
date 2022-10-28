@@ -1,7 +1,6 @@
 package org.keyrus.repositories;
-
-import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoRepository;
 import org.keyrus.models.Inventory;
+import io.quarkus.mongodb.panache.reactive.ReactivePanacheMongoRepository;
 
 import javax.enterprise.context.ApplicationScoped;
 

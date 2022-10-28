@@ -20,6 +20,9 @@ import java.util.concurrent.CompletableFuture;
 public class InventoryService {
     @Inject
     InventoryRepository inventoryRepository;
+    @Inject
+    @Channel("inventory")
+    Emitter<Inventory> inventoryEmitter;
 
     public Uni<Response> getAll() {
         return inventoryRepository.streamAll()
@@ -69,9 +72,11 @@ public class InventoryService {
                 .entity("{\"message\":\"Inventory does not exist\"}").build());
     }
 
+
     @Inject
     @Channel("inventory")
     Emitter<Inventory> inventoryEmitter;
+
     public Uni<Inventory> generate(Inventory notificationInventory) {
         inventoryEmitter.send(Message.of(notificationInventory)
                 .withAck(() ->
@@ -87,5 +92,11 @@ public class InventoryService {
         );
 
         return Uni.createFrom().item(notificationInventory);
+    }
+
+
+    public Uni<Inventory> getInventoryByProductID(ObjectId id) {
+        return inventoryRepository
+                .find("productId", id).firstResult().onItem().ifNull().failWith(NotFoundException::new);
     }
 }
