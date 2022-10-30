@@ -1,56 +1,85 @@
 package com.keyrus.of.service;
 
+import com.keyrus.of.Client.InventoryClient;
+import com.keyrus.of.model.Inventory;
 import com.keyrus.of.model.Order;
 import com.keyrus.of.model.State;
 import com.keyrus.of.repository.OrdreRepository;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class OrderService {
-    private Set<Order> Orders = new HashSet<>();
     @Inject
     OrdreRepository OrderRepository;
+    @Inject
+    @RestClient
+    InventoryClient inventoryClient;
 
-    public Multi<Order> findAllOrders()
-    {
+    @Inject
+    KafkaEvents kafkaEvents;
+
+    Inventory savedInventory;
+    private Set<Order> Orders = new HashSet<>();
+
+    public Multi<Order> findAllOrders() {
         return OrderRepository.streamAll();
     }
+
     public Uni<Response> createOrder(Order o) {
 
-        o.state= State.Pending;
+        o.state = State.Pending;
         return OrderRepository.persist(o)
                 .map(orderCreated -> Response.status(Response.Status.CREATED).build());
     }
 
     public Uni<Response> ValidateOrder(Order o) {
-        o.state=State.Validated;
+        return inventoryClient.quantityProduct(o.getProduct().id)
+                .map(inventory -> {
+                    savedInventory = inventory;
+                    if (inventory.getQte() < 1) {
+                        throw new NotAcceptableException(Response.status(Response.Status.NOT_ACCEPTABLE).entity("{\"message\": \"Out of stock\"}").build());
+                    }
+                    o.setState(State.Validated);
+                    return o;
+                })
+                .chain(order -> OrderRepository.findById(o.id))
+                .onItem().ifNull().failWith(NotFoundException::new)
+                .chain(order -> OrderRepository.update(o))
+                .map(order -> Response.status(Response.Status.OK).entity(order).build())
+                .ifNoItem()
+                .after(Duration.ofSeconds(3))
+                .recoverWithUni(Uni.createFrom().item(Response.noContent().build()))
+                .call(res -> {
+                    if (res.getStatus() == 200) {
+                        savedInventory.setQte(savedInventory.getQte() - 1);
+                        kafkaEvents.sendInventoryUpdater(savedInventory);
+                        System.out.println(savedInventory);
+                    }
+                    return Uni.createFrom().item(res);
+                })
+                ;
 
-            return OrderRepository
-                    .findById(o.id)
-                    .call(order -> OrderRepository.update(o))
-                    .map(order -> Response.status(Response.Status.OK).entity(order).build())
-                    .ifNoItem()
-                    .after(Duration.ofSeconds(7))
-                    .recoverWithUni(Uni.createFrom().item(Response.noContent().build()));
+    }
 
-        }
     public Uni<Response> CancelOrder(Order o) {
 
-        o.state=State.Canceled;
+        o.state = State.Canceled;
         return OrderRepository
-
                 .findById(o.id)
-
                 .call(order -> OrderRepository.update(o))
                 //.chain(o->Response.status(Response.Status.OK).entity(o).build())
                 .map(it -> Response.status(Response.Status.OK).entity(it).build())
@@ -60,16 +89,27 @@ public class OrderService {
 // map pour retourner le res modifié avec rep OK
     }
 
-   public Multi<Order> findByIdUser(String id) {
-       return OrderRepository
-               .streamAll()
-               .filter(a -> a.getUser().getId().equals(new ObjectId(id)));
-
-   }
-/*
     public Multi<Order> findByIdUser(String id) {
-        return Orders.stream().filter(a -> a.getUser().equals(id)).collect(Collectors.toSet());
+        return OrderRepository
+                .streamAll()
+                .filter(a -> a.getUser().getId().equals(new ObjectId(id)));
     }
-*/
 
+    public Uni<Long> findCountProductId(ObjectId id) {
+        return OrderRepository.count(" state='Validated' where product.id = ?1 ", id);
+
+    }
+
+    @Incoming("inventory")
+    @Outgoing("mail")
+    public Multi<String> getOrdersByProductId(Inventory inventory) {
+        return OrderRepository.stream(" state='Pending' where product.id = ?1 ", inventory.getProductId())
+                .map(order -> {
+                    return "Bonjour mr/mrs "
+                            + order.getUser().nom
+                            + order.getUser().getPrenom()
+                            + " votre commande en cours doit être annulée car le produit est hors stock";
+                        }
+                );
+    }
 }

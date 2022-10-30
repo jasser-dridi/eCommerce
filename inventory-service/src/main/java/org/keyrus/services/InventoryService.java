@@ -6,6 +6,7 @@ import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.bson.types.ObjectId;
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
+import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Message;
 import org.keyrus.models.Inventory;
 import org.keyrus.repositories.InventoryRepository;
@@ -20,6 +21,10 @@ import java.util.concurrent.CompletableFuture;
 public class InventoryService {
     @Inject
     InventoryRepository inventoryRepository;
+    @Inject
+    @Channel("inventory")
+    Emitter<Inventory> inventoryEmitter;
+
 
     public Uni<Response> getAll() {
         return inventoryRepository.streamAll()
@@ -46,7 +51,12 @@ public class InventoryService {
         return inventoryRepository.findById(inventory.getId())
                 .onItem().ifNull().failWith(notFound())
                 .chain(found -> inventoryRepository.update(inventory))
-                .call(this::generate)
+                .call(updated -> {
+                    if (updated.getQte() < 1) {
+                        generate(updated);
+                    }
+                    return Uni.createFrom().item(updated);
+                })
                 .map(updated_inventory -> Response.accepted(updated_inventory).build());
     }
 
@@ -69,9 +79,6 @@ public class InventoryService {
                 .entity("{\"message\":\"Inventory does not exist\"}").build());
     }
 
-    @Inject
-    @Channel("inventory")
-    Emitter<Inventory> inventoryEmitter;
     public Uni<Inventory> generate(Inventory notificationInventory) {
         inventoryEmitter.send(Message.of(notificationInventory)
                 .withAck(() ->
@@ -87,5 +94,16 @@ public class InventoryService {
         );
 
         return Uni.createFrom().item(notificationInventory);
+    }
+
+
+    public Uni<Inventory> getInventoryByProductID(ObjectId id) {
+        return inventoryRepository
+                .find("productId", id).firstResult().onItem().ifNull().failWith(NotFoundException::new);
+    }
+
+    @Incoming("update")
+    public Uni<Response> updateEvent(Inventory inventory) {
+        return update(inventory);
     }
 }

@@ -4,6 +4,8 @@ import com.keyrus.of.model.Order;
 import com.keyrus.of.service.OrderService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import org.bson.types.ObjectId;
+
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -53,6 +55,14 @@ public class OrderController {
     public Multi<Order> findByIdUser(String id)
     {
         return orderService.findByIdUser(id);
+    }
+
+    @Path("/countidprod/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<Long> findContyProductId(@PathParam("id") ObjectId id)
+    {
+        return orderService.findCountProductId(id);
     }
 
 }
