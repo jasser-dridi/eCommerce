@@ -2,20 +2,32 @@ package com.keyrus.ecommerce.category.producers;
 
 import com.keyrus.ecommerce.category.model.Category;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.kafka.Record;
+import io.smallrye.reactive.messaging.kafka.api.OutgoingKafkaRecordMetadata;
+import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.bson.types.ObjectId;
-import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.eclipse.microprofile.reactive.messaging.Emitter;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.eclipse.microprofile.reactive.messaging.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.concurrent.CompletableFuture;
 
 @ApplicationScoped
 public class CategoryProducer {
 
-    @Outgoing("category")
-    public Multi<Record<ObjectId, Category>> category() {
-        return Multi.createFrom().items(Category.builder().name("EAU").build()).map(m -> Record.of(m.getId(), m));
+    @Inject
+    @Channel("category-outV2")
+    Emitter<Message<Category>> inventoryEmitter;
+   /* public Uni<Category> generate(Category category) {
+        inventoryEmitter.send(Record.of(category.getId(),category));
+        return Uni.createFrom().item(category);
+    }
+
+    */
+
+    public void sendEvToProduct(Category c)
+    {
+        inventoryEmitter.send(Message.of(c));
     }
 }

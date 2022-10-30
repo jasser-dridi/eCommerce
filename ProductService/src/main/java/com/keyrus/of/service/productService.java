@@ -1,7 +1,6 @@
 package com.keyrus.of.service;
 
 import com.keyrus.of.Client.BundleClient;
-import com.keyrus.of.repository.productRepository;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -9,7 +8,7 @@ import java.lang.Exception;
 import java.time.Duration;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
+import com.keyrus.of.repository.productRepository;
 import com.keyrus.of.model.Product;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -20,7 +19,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 public class productService {
     @Inject
     productRepository productRepository;
-
+    productRepos
     @Inject
     @RestClient
     BundleClient bundleClient;
