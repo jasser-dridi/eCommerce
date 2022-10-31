@@ -35,10 +35,6 @@ public class CategoryRessource {
     @Inject
     CategoryProducer categoryProducer;
 
-    @Inject
-    @Channel("category-inV2")
-    Multi<Category> categories;
-
   /*  @POST
     @Path("/sendtopic")
     public Uni< Category> sendTopic() {
@@ -48,10 +44,10 @@ public class CategoryRessource {
 
    */
     @GET
-    @Path("/gettopic")
+    @Path("")
     @Produces(MediaType.APPLICATION_JSON)
-    public Uni<Category> getTopic() {
-        return categories.toUni();
+    public Multi<Category> getTopic() {
+        return categoryService.getAll();
 
 //        List<Category> categoryList= new ArrayList<>();
 //       ConsumerRecords<ObjectId, Category> consumerRecord= consumer.poll(Duration.ofSeconds(10));

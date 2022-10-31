@@ -6,8 +6,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.keyrus.of.model.Product;
-import com.keyrus.of.repository.productRepository;
-import com.keyrus.of.service.productService;
+import com.keyrus.of.service.ProductService;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
@@ -17,10 +16,10 @@ import org.bson.types.ObjectId;
 @Produces(MediaType.APPLICATION_JSON)
 public class productController {
 
+
     @Inject
-    productRepository productRepository;
-    @Inject
-    productService productService;
+    ProductService productService;
+
 
     @GET
     @Path("listProducts")

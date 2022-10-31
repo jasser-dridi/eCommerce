@@ -35,9 +35,13 @@ public class CategoryService {
     }
 
     public Uni<Response> update(Category category) {
-        return categoryRepository.findById(category.getId()).onItem()
-                .call(category1 ->   categoryRepository.update(category))
-                .invoke(category1 -> categoryProducer.sendEvToProduct(category1))
+        return categoryRepository.findById(category.getId())
+                .chain(category1 ->   categoryRepository.update(category)
+                        .chain(category2 -> {
+                            categoryProducer.sendEvToProduct(category2);
+                            return Uni.createFrom().item(category2);
+                        }))
+
                 .map(category1 -> Response.status(Response.Status.OK).entity(category1).build());
     }
 

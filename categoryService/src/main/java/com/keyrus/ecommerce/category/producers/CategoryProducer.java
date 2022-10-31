@@ -18,7 +18,7 @@ public class CategoryProducer {
 
     @Inject
     @Channel("category-outV2")
-    Emitter<Message<Category>> inventoryEmitter;
+    Emitter<Category> inventoryEmitter;
    /* public Uni<Category> generate(Category category) {
         inventoryEmitter.send(Record.of(category.getId(),category));
         return Uni.createFrom().item(category);
@@ -28,6 +28,6 @@ public class CategoryProducer {
 
     public void sendEvToProduct(Category c)
     {
-        inventoryEmitter.send(Message.of(c));
+        inventoryEmitter.send(c);
     }
 }

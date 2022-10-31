@@ -1,28 +1,35 @@
 package com.keyrus.of.service;
 
 import com.keyrus.of.Client.BundleClient;
+import static com.mongodb.client.model.Filters.eq;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.lang.Exception;
-import java.time.Duration;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import com.keyrus.of.repository.productRepository;
+import com.keyrus.of.model.Category;
 import com.keyrus.of.model.Product;
+import com.keyrus.of.repository.ProductRepository;
+import com.mongodb.client.model.Updates;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.bson.types.ObjectId;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+import java.time.Duration;
+
 @ApplicationScoped
-public class productService {
+public class ProductService {
     @Inject
-    productRepository productRepository;
-    productRepos
+    ProductRepository productRepository;
+
+
     @Inject
     @RestClient
     BundleClient bundleClient;
+
+
 
     public Multi<Product> all() {
         return productRepository.streamAll().onCompletion().ifEmpty().failWith(() -> new Exception("No data found "));
@@ -45,6 +52,17 @@ public class productService {
                 .ifNoItem()
                 .after(Duration.ofSeconds(7))
                 .recoverWithUni(Uni.createFrom().item(Response.noContent().build()));
+
+    }
+    public Uni<Product> updateTopicProduct(Category category1) {
+        System.out.println(category1.id);
+       return  productRepository.findProductByCategoryId(category1.id)
+                .call(product ->{
+                    System.out.println("product : "+product.toString());
+                    return productRepository.
+                        mongoCollection()
+                        .updateMany(eq("category._id", product.category.id)
+                                , Updates.set("category", category1)).map(product1 -> Uni.createFrom().item(product1.getMatchedCount()));}).toUni();
 
     }
 

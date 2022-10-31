@@ -18,10 +18,10 @@ import javax.inject.Inject;
 public class CategoryConsumer {
 
 
-@Incoming("category-inV2")
 
     public Multi<Category> consume(Record<String, Category> record)
 {
+    System.out.println("inside a consumer");
         String key = record.key(); // Can be `null` if the incoming record has no key
     return Multi.createFrom().item(record.value());
 

@@ -11,5 +11,7 @@
         <module>categoryService</module>
         <module>inventory-service</module>
         <module>ordre-service</module>
+        <module>user-service</module>
+        <module>ProductService</module>
     </modules>
 </project>
