@@ -1,18 +1,18 @@
 package com.keyrus.ecommerce.category.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.*;
 import org.bson.types.ObjectId;
 
-@NoArgsConstructor
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 public class Category {
 
     private ObjectId id;
     private String name;
     private String description;
 
+    public Category(){}
 }

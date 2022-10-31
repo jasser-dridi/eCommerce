@@ -2,6 +2,7 @@ package com.keyrus.ecommerce.category.service;
 
 import com.keyrus.ecommerce.category.client.ProductClient;
 import com.keyrus.ecommerce.category.model.Category;
+import com.keyrus.ecommerce.category.producers.CategoryProducer;
 import com.keyrus.ecommerce.category.repository.CategoryRepository;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -23,6 +24,8 @@ public class CategoryService {
     @RestClient
     ProductClient productClient;
 
+    @Inject
+    CategoryProducer categoryProducer;
     public Multi<Category> getAll() {
         return categoryRepository.streamAll();
     }
@@ -32,7 +35,14 @@ public class CategoryService {
     }
 
     public Uni<Response> update(Category category) {
-        return categoryRepository.findById(category.getId()).onItem().call(category1 -> categoryRepository.update(category)).map(category1 -> Response.status(Response.Status.OK).entity(category1).build());
+        return categoryRepository.findById(category.getId())
+                .chain(category1 ->   categoryRepository.update(category)
+                        .chain(category2 -> {
+                            categoryProducer.sendEvToProduct(category2);
+                            return Uni.createFrom().item(category2);
+                        }))
+
+                .map(category1 -> Response.status(Response.Status.OK).entity(category1).build());
     }
 
     public Uni<Response> add(Category category) {
