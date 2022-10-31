@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.keyrus</groupId>
   <artifactId>user</artifactId>
@@ -29,15 +28,16 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
-
-
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>1.18.24</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-mongodb-panache</artifactId>
@@ -67,10 +67,13 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-reactive-jackson</artifactId>
     </dependency>
-
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-rest-client-reactive-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-mailer</artifactId>
     </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
@@ -81,7 +84,6 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-openapi</artifactId>
     </dependency>
-
   </dependencies>
   <build>
     <plugins>
@@ -130,8 +132,7 @@
             </goals>
             <configuration>
               <systemPropertyVariables>
-                <native.image.path>${project.build.directory}/${project.build.finalName}-runner
-                </native.image.path>
+                <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
                 <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                 <maven.home>${maven.home}</maven.home>
               </systemPropertyVariables>
