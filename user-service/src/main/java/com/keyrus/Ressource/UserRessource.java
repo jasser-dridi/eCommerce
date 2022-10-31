@@ -2,6 +2,7 @@ package com.keyrus.Ressource;
 
 import com.keyrus.OrderClient.Order;
 import com.keyrus.Service.UserService;
+import com.keyrus.consumer.MailConsumer;
 import com.keyrus.model.User;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -12,6 +13,8 @@ import javax.ws.rs.core.Response;
 
 @Path("api/users")
 public class UserRessource {
+    @Inject
+    MailConsumer mailConsumer;
     @Inject
     UserService userService;
 
